@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TickTackToe</title>
+    <style>
+        body {
+            background-color: #333;
+            /* רקע אפור כהה */
+            color: white;
+            /* צבע טקסט לבן */
+            font-family: Arial, sans-serif;
+            text-align: center;
+            /* מרכז את כל התוכן */
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #00aaff;
+            /* צבע כותרת כחול-תכלת */
+            animation: glow 1.5s infinite alternate;
+            /* הנפשה עדינה לכותרת */
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #00aaff, 0 0 20px #00aaff, 0 0 30px #00aaff;
+            }
+
+            to {
+                text-shadow: 0 0 20px #00aaff, 0 0 30px #00aaff, 0 0 40px #00aaff;
+            }
+        }
+
+        #XO button {
+            width: 80px;
+            height: 80px;
+            font-size: 24px;
+            margin: 5px;
+            background-color: #555;
+            /* רקע אפור בינוני לכפתורים */
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 4px #999;
+            /* יצירת אפקט תלת מימד */
+        }
+
+        #XO button:hover {
+            background-color: #777;
+            /* צבע רקע בהיר יותר בכפתור */
+            transform: scale(1.1);
+            /* הגדלה בעת ריחוף */
+        }
+
+        #XO button:active {
+            background-color: #999;
+            /* צבע רקע בעת לחיצה */
+            transform: scale(1.2);
+            /* הגדלה נוספת בעת לחיצה */
+            box-shadow: 0 2px #666;
+            /* אפקט תלת מימד בעת לחיצה */
+        }
+
+        #XO button.win-highlight {
+            animation: highlight 1s infinite alternate;
+            /* הנפשה להדגשת כפתורי הניצחון */
+        }
+
+        @keyframes highlight {
+            from {
+                background-color: #ffdd57;
+                /* צבע צהוב */
+            }
+
+            to {
+                background-color: #ffaa00;
+                /* צבע כתום בהיר */
+            }
+        }
+
+        #declare,
+        #winX,
+        #winO {
+            font-size: 24px;
+            margin: 15px;
+            transition: transform 0.2s, color 0.3s;
+        }
+
+        #declare {
+            color: #ffdd57;
+            /* צבע צהוב להודעת תור */
+        }
+
+        #winX,
+        #winO {
+            color: #ff8857;
+            /* צבע כתום לסופרי הניצחונות */
+            animation: pulse 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+                color: #ff8857;
+            }
+
+            to {
+                transform: scale(1.2);
+                color: #ff5547;
+            }
+        }
+
+        button[type="button"] {
+            font-size: 20px;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #00aaff;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button[type="button"]:hover {
+            background-color: #007acc;
+            /* צבע כהה יותר בכפתור */
+            transform: scale(1.1);
+        }
+
+        button[type="button"]:active {
+            background-color: #005f99;
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h1>TickTackToe</h1>
+    </div>
+
+    <div>
+        <p id="declare">Let's Play!</p>
+    </div>
+    <div>
+        <p id="winX">X Wins = 0</p>
+        <p id="winO">O Wins = 0</p>
+    </div>
+    <div id="XO" onclick="buttclik(event)">
+        <button id="butt1">-</button><button id="butt2">-</button><button id="butt3">-</button><br>
+        <button id="butt4">-</button><button id="butt5">-</button><button id="butt6">-</button><br>
+        <button id="butt7">-</button><button id="butt8">-</button><button id="butt9">-</button>
+    </div>
+    <div>
+        <button type="button" onclick="ResGam()">Reset Game</button>
+        <button type="button" onclick="CleaWin()">Clear Wins</button>
+    </div>
+
+    <script>
+        let a = 0;
+        let b = 0;
+        let turn = true;
+        let gameActive = true;
+        const WINX = document.getElementById("winX");
+        const WINO = document.getElementById("winO");
+        const decla = document.getElementById("declare");
+        const XOXO = document.getElementById("XO");
+        let buttons = {};
+        for (let i = 1; i < 10; i++) {
+            buttons[`butt${i}`] = document.getElementById(`butt${i}`);
+        }
+
+        //button click
+        function buttclik(event) {
+           if (gameActive === false) return;
+            if (turn === true && event.target.innerText == "-") {
+                event.target.innerText = "X";
+                decla.innerText = "it's O turn!";
+                turn = false;
+            } else {
+                if (event.target.innerText == "-") {
+                    event.target.innerText = "O";
+                    decla.innerText = "its X turn!";
+                    turn = true;
+                }
+            }
+            win();
+        }
+
+        function ResGam() {
+            gameActive = true;
+            for (let i = 1; i < 10; i++) {
+                buttons[`butt${i}`].innerText = "-";
+                buttons[`butt${i}`].classList.remove("win-highlight"); // הסר את ההדגשה אחרי איפוס
+            }
+            decla.innerText = "Let's Play!";
+        }
+
+        function Ocounter() {
+            a += 1;
+            WINO.innerText = `O Wins = ${a}`;
+        }
+
+        function Xcounter() {
+            b += 1;
+            WINX.innerText = `X Wins = ${b}`;
+        }
+
+        function CleaWin() {
+            WINX.innerText = `X Wins = 0`;
+            WINO.innerText = `O Wins = 0`;
+        }
+
+        // highlight the winning buttons
+        function highlightWin(b1, b2, b3) {
+            buttons[b1].classList.add("win-highlight");
+            buttons[b2].classList.add("win-highlight");
+            buttons[b3].classList.add("win-highlight");
+        }
+
+        // win
+        function win() {
+            if (buttons.butt1.innerText == "O" && buttons.butt2.innerText == "O" && buttons.butt3.innerText == "O") {
+                gameActive = false;
+                decla.innerText = "O Wins!!!";
+                Ocounter();
+                highlightWin("butt1", "butt2", "butt3");
+            } else if (buttons.butt4.innerText == "O" && buttons.butt5.innerText == "O" && buttons.butt6.innerText == "O") {
+                gameActive = false;
+                decla.innerText = "O Wins!!!";
+                Ocounter();
+                highlightWin("butt4", "butt5", "butt6");
+            } else if (buttons.butt7.innerText == "O" && buttons.butt8.innerText == "O" && buttons.butt9.innerText == "O") {
+                gameActive = false;
+                decla.innerText = "O Wins!!!";
+                Ocounter();
+                highlightWin("butt7", "butt8", "butt9");
+            } else if (buttons.butt1.innerText == "O" && buttons.butt4.innerText == "O" && buttons.butt7.innerText == "O") {
+                gameActive = false;
+                decla.innerText = "O Wins!!!";
+                Ocounter();
+                highlightWin("butt1", "butt4", "butt7");
+            } else if (buttons.butt2.innerText == "O" && buttons.butt5.innerText == "O" && buttons.butt8.innerText == "O") {
+                gameActive = false;
+                decla.innerText = "O Wins!!!";
+                Ocounter();
+                highlightWin("butt2", "butt5", "butt8");
+            } else if (buttons.butt3.innerText == "O" && buttons.butt6.innerText == "O" && buttons.butt9.innerText == "O") {
+                gameActive = false;
+                decla.innerText = "O Wins!!!";
+                Ocounter();
+                highlightWin("butt3", "butt6", "butt9");
+            } else if (buttons.butt1.innerText == "O" && buttons.butt5.innerText == "O" && buttons.butt9.innerText == "O") {
+                gameActive = false;
+                decla.innerText = "O Wins!!!";
+                Ocounter();
+                highlightWin("butt1", "butt5", "butt9");
+            } else if (buttons.butt3.innerText == "O" && buttons.butt5.innerText == "O" && buttons.butt7.innerText == "O") {
+                gameActive = false;
+                decla.innerText = "O Wins!!!";
+                Ocounter();
+                highlightWin("butt3", "butt5", "butt7");
+            } else if (buttons.butt1.innerText == "X" && buttons.butt2.innerText == "X" && buttons.butt3.innerText == "X") {
+                gameActive = false;
+                decla.innerText = "X Wins!!!";
+                Xcounter();
+                highlightWin("butt1", "butt2", "butt3");
+            } else if (buttons.butt4.innerText == "X" && buttons.butt5.innerText == "X" && buttons.butt6.innerText == "X") {
+                gameActive = false;
+                decla.innerText = "X Wins!!!";
+                Xcounter();
+                highlightWin("butt4", "butt5", "butt6");
+            } else if (buttons.butt7.innerText == "X" && buttons.butt8.innerText == "X" && buttons.butt9.innerText == "X") {
+                gameActive = false;
+                decla.innerText = "X Wins!!!";
+                Xcounter();
+                highlightWin("butt7", "butt8", "butt9");
+            } else if (buttons.butt1.innerText == "X" && buttons.butt4.innerText == "X" && buttons.butt7.innerText == "X") {
+                gameActive = false;
+                decla.innerText = "X Wins!!!";
+                Xcounter();
+                highlightWin("butt1", "butt4", "butt7");
+            } else if (buttons.butt2.innerText == "X" && buttons.butt5.innerText == "X" && buttons.butt8.innerText == "X") {
+                gameActive = false;
+                decla.innerText = "X Wins!!!";
+                Xcounter();
+                highlightWin("butt2", "butt5", "butt8");
+            } else if (buttons.butt3.innerText == "X" && buttons.butt6.innerText == "X" && buttons.butt9.innerText == "X") {
+                gameActive = false;
+                decla.innerText = "X Wins!!!";
+                Xcounter();
+                highlightWin("butt3", "butt6", "butt9");
+            } else if (buttons.butt1.innerText == "X" && buttons.butt5.innerText == "X" && buttons.butt9.innerText == "X") {
+                gameActive = false;
+                decla.innerText = "X Wins!!!";
+                Xcounter();
+                highlightWin("butt1", "butt5", "butt9");
+            } else if (buttons.butt3.innerText == "X" && buttons.butt5.innerText == "X" && buttons.butt7.innerText == "X") {
+                gameActive = false;
+                decla.innerText = "X Wins!!!";
+                Xcounter();
+                highlightWin("butt3", "butt5", "butt7");
+            }
+        }
+    </script>
+
+</html>
